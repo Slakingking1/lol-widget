@@ -1,0 +1,12 @@
+{
+  "Ahri": {
+    "strong": [
+      { "champion": "Veigar", "winrate": 54.8 },
+      { "champion": "Lux", "winrate": 53.1 }
+    ],
+    "weak": [
+      { "champion": "Zed", "winrate": 45.9 },
+      { "champion": "Fizz", "winrate": 44.8 }
+    ]
+  }
+}

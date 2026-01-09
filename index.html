@@ -2,19 +2,120 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>LoL Widget</title>
+<title>LoL Champion Counters</title>
+
 <style>
 body {
   margin: 0;
   background: #020617;
-  color: white;
-  font-family: Arial;
+  color: #e5e7eb;
+  font-family: Arial, sans-serif;
+}
+
+.card {
   padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #1e293b;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.counter img {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  margin-right: 6px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+}
+
+.strong { color: #22c55e; }
+.weak { color: #ef4444; }
+
+.footer {
+  font-size: 11px;
+  opacity: 0.6;
+  margin-top: 6px;
 }
 </style>
 </head>
+
 <body>
-  <h2>League of Legends Widget</h2>
-  <p>If you see this, it works.</p>
+<div class="card" id="widget">Loading counters…</div>
+
+<script>
+const PATCH = "13.24.1"; // safe, stable patch
+const params = new URLSearchParams(window.location.search);
+const champion = params.get("champion") || "Ahri";
+
+Promise.all([
+  fetch("data/counters.json").then(r => r.json()),
+  fetch("data/champion-ids.json").then(r => r.json())
+]).then(([counters, ids]) => {
+
+  if (!counters[champion]) {
+    document.getElementById("widget").innerText =
+      "No counter data available.";
+    return;
+  }
+
+  const icon = champ =>
+    `https://ddragon.leagueoflegends.com/cdn/${PATCH}/img/champion/${ids[champ]}.png`;
+
+  const c = counters[champion];
+
+  document.getElementById("widget").innerHTML = `
+    <div class="header">
+      <img src="${icon(champion)}" />
+      <b>${champion} Counters</b>
+    </div>
+
+    <b>Strong Against</b>
+    ${c.strong.map(x => `
+      <div class="counter strong">
+        <div class="left">
+          <img src="${icon(x.champion)}" />
+          ${x.champion}
+        </div>
+        ${x.winrate}%
+      </div>
+    `).join("")}
+
+    <b style="margin-top:6px;display:block;">Weak Against</b>
+    ${c.weak.map(x => `
+      <div class="counter weak">
+        <div class="left">
+          <img src="${icon(x.champion)}" />
+          ${x.champion}
+        </div>
+        ${x.winrate}%
+      </div>
+    `).join("")}
+
+    <div class="footer">Matchup winrates</div>
+  `;
+});
+</script>
 </body>
 </html>
